@@ -14,6 +14,12 @@ config/name="Maze Generation"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
+[file_customization]
+
+folder_colors={
+"res://aseprite/": "teal"
+}
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
