@@ -35,7 +35,7 @@ class Cell:
 	var state := CellState.DISCONNECTED
 	var connect_vector: int
 	var invite_vector: int
-	var neighbours: Array[bool] # 4 bits: North, East, South, West
+	var neighbours: int = 0b0000 # 4 bits: North, East, South, West
 
 func _init():
 	rng = RandomNumberGenerator.new()
@@ -94,7 +94,7 @@ func progress_generation() -> void:
 			
 		CellState.SEED:
 			var neighbour_coords: Vector2i
-			var neighbour_directions: Array[int]
+			var found_neighbours: int = 0b0000
 			
 			# Find all neighbours in the disconnected state
 			for i in range(len(DIRECTIONS)):
@@ -104,12 +104,7 @@ func progress_generation() -> void:
 				if maze.has(neighbour_coords):
 					if maze[neighbour_coords].state == CellState.DISCONNECTED:
 						# Update the bitfield 
-						maze[active_cell_coords].neighbours[i] = true
-						neighbour_directions.append(i)
-					else:
-						maze[active_cell_coords].neighbours[i] = false
-				else:
-					maze[active_cell_coords].neighbours[i] = false
+						found_neighbours = found_neighbours | (2**i)
 			
 			# Pick a random neighbour and change it into the seed state
 			var random_direction: Vector2i = DIRECTIONS[rng.randi_range(0, len(DIRECTIONS))]
