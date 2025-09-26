@@ -94,20 +94,26 @@ func progress_generation() -> void:
 			
 		CellState.SEED:
 			var neighbour_coords: Vector2i
-			var found_neighbours: int = 0b0000
+			var found_neighbours: int = 0b0000 # 4 bits: North, East, South, West
+			var candidate_directions: Array[Vector2i]
 			
-			# Find all neighbours in the disconnected state
+			# Look in each direction for neighbours in the disconnected state
 			for i in range(len(DIRECTIONS)):
 				neighbour_coords = active_cell_coords + DIRECTIONS[i]
 				
 				# Ensure coordinates are in-bounds
 				if maze.has(neighbour_coords):
 					if maze[neighbour_coords].state == CellState.DISCONNECTED:
-						# Update the bitfield 
+						# Add the direction to the valid neighbour to the bitfield
 						found_neighbours = found_neighbours | (2**i)
+						candidate_directions.append(DIRECTIONS[i])
 			
-			# Pick a random neighbour and change it into the seed state
-			var random_direction: Vector2i = DIRECTIONS[rng.randi_range(0, len(DIRECTIONS))]
+			# Update this seed cell's valid neighbour list
+			maze[active_cell_coords].neighbours = found_neighbours
+			# Pick a random valid neighbour to change into a new seed
+			var random_direction := candidate_directions[
+					rng.randi_range(0, len(candidate_directions))]
+			# TODO: change this cell to invite state and some other stuff
 			
 			
 		CellState.INVITE:
