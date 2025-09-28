@@ -16,6 +16,7 @@ var rng: RandomNumberGenerator
 var rng_initial_state: int
 var active_cell_coords: Vector2i
 var is_maze_complete: bool = false
+var seed_cells: Array[Vector2i]
 
 var DIRECTIONS: Array[Vector2i] = [
 	Vector2i.UP,	# Direction 0
@@ -33,9 +34,9 @@ enum CellState {
 
 class Cell:
 	var state := CellState.DISCONNECTED
-	var connect_vector: int
-	var invite_vector: int
-	var neighbours: int = 0b0000 # 4 bits: North, East, South, West
+	var connect_vector: int = -1	# 0-3: North, East, South, West
+	var invite_vector: int = -1		# 0-3: North, East, South, West
+	var neighbours: int = 0b0000	# 4 bits: North, East, South, West
 
 func _init():
 	rng = RandomNumberGenerator.new()
@@ -70,17 +71,16 @@ func clear_maze() -> void:
 func pick_start_seed() -> void:
 	var rand_x: int = rng.randi_range(0, (maze_width - 1))
 	var rand_y: int = rng.randi_range(0, (maze_height - 1))
-	set_cell(Vector2i(rand_x, rand_y), CellState.SEED)
+	set_cell_state(Vector2i(rand_x, rand_y), CellState.SEED)
 
-func set_cell(cell_coords: Vector2i, new_state: CellState) -> void:
+func set_cell_state(cell_coords: Vector2i, new_state: CellState) -> void:
 	maze[cell_coords].state = new_state
 	
 	match new_state:
 		CellState.DISCONNECTED:
 			return
 		CellState.SEED:
-			# Make this cell the next one to update
-			active_cell_coords = cell_coords
+			return
 		CellState.INVITE:
 			return
 		CellState.CONNECTED:
@@ -110,16 +110,41 @@ func progress_generation() -> void:
 			
 			# Update this seed cell's valid neighbour list
 			maze[active_cell_coords].neighbours = found_neighbours
-			# Pick a random valid neighbour to change into a new seed
-			var random_direction: int = candidate_directions[
-					rng.randi_range(0, len(candidate_directions))]
-			# TODO: change this cell to invite state and some other stuff
-			maze[active_cell_coords].invite_vector = random_direction
 			
+			# Randomly choose a direction to continue in
+			var chosen_candidate: int = -1
+			var parent_direction: int = maze[active_cell_coords].connect_vector
 			
+			# Bias towards going straight forward rather than turning
+			if len(candidate_directions) > 1 and parent_direction != -1 \
+					and candidate_directions.has((parent_direction + 2) % 4):
+				if rng.randi_range(1, 100) > turn_probability:
+					chosen_candidate = (parent_direction + 2) % 4
+				else:
+					candidate_directions.erase((parent_direction + 2) % 4)
+			
+			# We will not be going straight forward or we only have one candidate
+			if chosen_candidate == -1:
+				chosen_candidate = candidate_directions[
+						rng.randi_range(0, len(candidate_directions))]
+			
+			# Remember this neighbour for backtracking, then change states
+			maze[active_cell_coords].invite_vector = chosen_candidate
+			maze[active_cell_coords].state = CellState.INVITE
+			seed_cells.erase(active_cell_coords)
 			
 		CellState.INVITE:
-			return
+			# Change invited cell into seed state
+			var neighbour_coords := active_cell_coords + \
+					DIRECTIONS[maze[active_cell_coords].invite_vector]
+			maze[neighbour_coords].state = CellState.SEED
+			seed_cells.append(neighbour_coords)
+			
+			# Change into connected state if there's no more neighbours
+			var neighbour_candidates: int = maze[active_cell_coords].neighbours
+			if (neighbour_candidates != 0) \
+					and (neighbour_candidates & (neighbour_candidates - 1) == 0):
+				maze[active_cell_coords].state = CellState.CONNECTED
 			
 		CellState.CONNECTED:
 			return
