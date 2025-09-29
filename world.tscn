@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://d2jqibm3vtgex"]
+
+[ext_resource type="Script" uid="uid://ddepihu7vsn5e" path="res://cellular_automata.gd" id="1_f3sb7"]
+
+[node name="World" type="Node2D"]
+
+[node name="Maze" type="Node2D" parent="."]
+script = ExtResource("1_f3sb7")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Map" type="Node2D" parent="UI"]

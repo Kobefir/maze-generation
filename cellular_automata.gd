@@ -15,8 +15,10 @@ var maze: Dictionary[Vector2i, Cell]
 var rng: RandomNumberGenerator
 var rng_initial_state: int
 var active_cell_coords: Vector2i
-var is_maze_complete: bool = false
 var seed_cells: Array[Vector2i]
+var branchable_connected_cells: Array[Vector2i]
+var disconnected_cell_count: int
+var is_maze_complete: bool = false
 
 var DIRECTIONS: Array[Vector2i] = [
 	Vector2i.UP,	# Direction 0
@@ -66,6 +68,8 @@ func clear_maze() -> void:
 			new_maze[Vector2i(x, y)] = Cell.new()
 	
 	maze = new_maze
+	disconnected_cell_count = maze_width * maze_height
+	is_maze_complete = false
 
 # Set a random cell in the maze to the seed state
 func pick_start_seed() -> void:
@@ -105,8 +109,16 @@ func progress_generation() -> void:
 				if maze.has(neighbour_coords):
 					if maze[neighbour_coords].state == CellState.DISCONNECTED:
 						# Add the direction to the valid neighbour to the bitfield
-						found_neighbours = found_neighbours | (2**i)
+						found_neighbours = found_neighbours | (2 ** i)
 						candidate_directions.append(i)
+			
+			# Immediately change to the connected state if no valid neighbours were found
+			if candidate_directions.is_empty():
+				maze[active_cell_coords].state = CellState.CONNECTED
+				# Complete the maze if this was the last disconnected cell
+				if disconnected_cell_count == 0:
+					is_maze_complete = true
+				return
 			
 			# Update this seed cell's valid neighbour list
 			maze[active_cell_coords].neighbours = found_neighbours
@@ -128,10 +140,9 @@ func progress_generation() -> void:
 				chosen_candidate = candidate_directions[
 						rng.randi_range(0, len(candidate_directions))]
 			
-			# Remember this neighbour for backtracking, then change states
+			# Remember this neighbour, then change states
 			maze[active_cell_coords].invite_vector = chosen_candidate
 			maze[active_cell_coords].state = CellState.INVITE
-			seed_cells.erase(active_cell_coords)
 			
 		CellState.INVITE:
 			# Change invited cell into seed state
@@ -139,12 +150,58 @@ func progress_generation() -> void:
 					DIRECTIONS[maze[active_cell_coords].invite_vector]
 			maze[neighbour_coords].state = CellState.SEED
 			seed_cells.append(neighbour_coords)
+			disconnected_cell_count -= 1
 			
-			# Change into connected state if there's no more neighbours
+			# Change into connected state if invited cell was the only neighbour
 			var neighbour_candidates: int = maze[active_cell_coords].neighbours
 			if (neighbour_candidates != 0) \
 					and (neighbour_candidates & (neighbour_candidates - 1) == 0):
 				maze[active_cell_coords].state = CellState.CONNECTED
+				seed_cells.erase(active_cell_coords)
+				return
+			
+			# Randomly decide whether or not to branch in another direction
+			if rng.randi_range(1, 100) > branch_probability: # Change to final state
+				maze[active_cell_coords].state = CellState.CONNECTED
+				seed_cells.erase(active_cell_coords)
+				# Remember that we may be able to branch again later if all seeds die
+				branchable_connected_cells.append(active_cell_coords)
+			else: # Return to seed state for another branch
+				maze[active_cell_coords].state = CellState.SEED
 			
 		CellState.CONNECTED:
-			return
+			# If there's at least one live seed, give control to the oldest one
+			if not seed_cells.is_empty():
+				active_cell_coords = seed_cells[0]
+				return
+			
+			# Randomly pick a new seed out of branchable connected seeds
+			var new_seed_found := false
+			for i in range(len(branchable_connected_cells)): # Indirectly access this array so we can erase from it
+				# Look in each direction for neighbours in the disconnected state
+				var neighbour_coords: Vector2i
+				var found_neighbours: int = 0b0000
+				for j in range(len(DIRECTIONS)):
+					neighbour_coords = active_cell_coords + DIRECTIONS[j]
+					# Ensure coordinates are in-bounds
+					if maze.has(neighbour_coords):
+						if maze[neighbour_coords].state == CellState.DISCONNECTED:
+							# Add the direction to the valid neighbour to the bitfield
+							found_neighbours = found_neighbours | (2 ** j)
+				
+				# Remove this cell from the candidates if it no longer has valid neighbours
+				if found_neighbours == 0:
+					branchable_connected_cells.remove_at(i)
+				# Randomly decide whether or not to revert to a seed again
+				elif rng.randi_range(1, 100) <= branch_probability:
+					maze[branchable_connected_cells[i]].state = CellState.SEED
+					seed_cells.append(branchable_connected_cells[i])
+					new_seed_found = true
+			
+			# If no new seeds were created, choose one random valid candidate
+			if not new_seed_found:
+				var chosen_candidate: Vector2i = branchable_connected_cells[
+						randi_range(0, len(branchable_connected_cells) - 1)]
+				maze[chosen_candidate].state = CellState.SEED
+				seed_cells.append(chosen_candidate)
+				
