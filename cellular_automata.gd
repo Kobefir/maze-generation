@@ -11,6 +11,7 @@ class_name CellularAutomata extends Node2D
 @export var branch_probability: int = 5 # Percent chance of branching
 @export var turn_probability: int = 10 # Percent chance of changing path directtionn
 
+
 var maze: Dictionary[Vector2i, Cell]
 var rng: RandomNumberGenerator
 var rng_initial_state: int
@@ -41,6 +42,7 @@ class Cell:
 	var neighbours: int = 0b0000	# 4 bits: North, East, South, West
 
 func _init():
+	SignalBus.generate_maze.connect(_on_generate_maze)
 	rng = RandomNumberGenerator.new()
 	
 	# Set the RandomNumberGenerator's seed if one was chosen by the player
@@ -49,7 +51,7 @@ func _init():
 	
 	rng_initial_state = rng.state
 
-func generate_maze() -> void:
+func _on_generate_maze() -> void:
 	clear_maze()
 	pick_start_seed()
 	
@@ -204,4 +206,3 @@ func progress_generation() -> void:
 						randi_range(0, len(branchable_connected_cells) - 1)]
 				maze[chosen_candidate].state = CellState.SEED
 				seed_cells.append(chosen_candidate)
-				
