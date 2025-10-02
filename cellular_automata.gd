@@ -43,6 +43,7 @@ class Cell:
 
 func _init():
 	SignalBus.generate_maze.connect(_on_generate_maze)
+	SignalBus.progress_generation.connect(_on_progress_generation)
 	rng = RandomNumberGenerator.new()
 	
 	# Set the RandomNumberGenerator's seed if one was chosen by the player
@@ -56,7 +57,7 @@ func _on_generate_maze() -> void:
 	pick_start_seed()
 	
 	while not is_maze_complete:
-		progress_generation()
+		_on_progress_generation()
 
 # Create empty maze consisting only of disconnected cells
 func clear_maze() -> void:
@@ -79,21 +80,8 @@ func pick_start_seed() -> void:
 	var rand_y: int = rng.randi_range(0, (maze_height - 1))
 	set_cell_state(Vector2i(rand_x, rand_y), CellState.SEED)
 
-func set_cell_state(cell_coords: Vector2i, new_state: CellState) -> void:
-	maze[cell_coords].state = new_state
-	
-	match new_state:
-		CellState.DISCONNECTED:
-			return
-		CellState.SEED:
-			return
-		CellState.INVITE:
-			return
-		CellState.CONNECTED:
-			return
-
 # Run cell simulation until one or more cells change state
-func progress_generation() -> void:
+func _on_progress_generation() -> void:
 	match maze[active_cell_coords].state:
 		CellState.DISCONNECTED:
 			return

@@ -6,6 +6,14 @@
 
 [node name="Maze" type="Node2D" parent="."]
 script = ExtResource("1_f3sb7")
+maze_width = null
+maze_height = null
+rng_seed = null
+initial_density = null
+wall_thickness = null
+floor_thickness = null
+branch_probability = null
+turn_probability = null
 
 [node name="UI" type="CanvasLayer" parent="."]
 

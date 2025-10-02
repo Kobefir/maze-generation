@@ -1,2 +1,2 @@
 signal generate_maze()
-signal clear_maze()
+signal progress_generation()
