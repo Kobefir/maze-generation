@@ -6,15 +6,14 @@
 
 [node name="Maze" type="Node2D" parent="."]
 script = ExtResource("1_f3sb7")
-maze_width = null
-maze_height = null
-rng_seed = null
-initial_density = null
-wall_thickness = null
-floor_thickness = null
-branch_probability = null
-turn_probability = null
 
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="Map" type="Node2D" parent="UI"]
+
+[node name="Button" type="Button" parent="UI"]
+offset_left = 527.0
+offset_top = 562.0
+offset_right = 688.0
+offset_bottom = 620.0
+text = "Generate maze"

@@ -9,7 +9,9 @@ class_name CellularAutomata extends Node2D
 @export var wall_thickness: int = 1
 @export var floor_thickness: int = 1
 @export var branch_probability: int = 5 # Percent chance of branching
-@export var turn_probability: int = 10 # Percent chance of changing path directtionn
+@export var turn_probability: int = 10 # Percent chance of changing path direction
+
+@export var update_frequency: float = 0.1 # Number of seconds between _on_progress_generation() calls
 
 
 var maze: Dictionary[Vector2i, Cell]
@@ -18,8 +20,8 @@ var rng_initial_state: int
 var active_cell_coords: Vector2i
 var seed_cells: Array[Vector2i]
 var branchable_connected_cells: Array[Vector2i]
-var disconnected_cell_count: int
-var is_maze_complete: bool = false
+var connected_cell_count: int
+var update_timer: Timer
 
 var DIRECTIONS: Array[Vector2i] = [
 	Vector2i.UP,	# Direction 0
@@ -44,6 +46,11 @@ class Cell:
 func _init():
 	SignalBus.generate_maze.connect(_on_generate_maze)
 	SignalBus.progress_generation.connect(_on_progress_generation)
+	
+	update_timer = Timer.new()
+	update_timer.timeout.connect(_on_update_timer_timeout)
+	update_timer.wait_time = update_frequency
+	
 	rng = RandomNumberGenerator.new()
 	
 	# Set the RandomNumberGenerator's seed if one was chosen by the player
@@ -55,9 +62,7 @@ func _init():
 func _on_generate_maze() -> void:
 	clear_maze()
 	pick_start_seed()
-	
-	while not is_maze_complete:
-		_on_progress_generation()
+	update_timer.start()
 
 # Create empty maze consisting only of disconnected cells
 func clear_maze() -> void:
@@ -65,20 +70,41 @@ func clear_maze() -> void:
 	rng.state = rng_initial_state
 	
 	var new_maze: Dictionary[Vector2i, Cell]
-	
 	for x in range(maze_width):
 		for y in range(maze_height):
 			new_maze[Vector2i(x, y)] = Cell.new()
 	
 	maze = new_maze
-	disconnected_cell_count = maze_width * maze_height
-	is_maze_complete = false
+	connected_cell_count = 0
 
 # Set a random cell in the maze to the seed state
 func pick_start_seed() -> void:
 	var rand_x: int = rng.randi_range(0, (maze_width - 1))
 	var rand_y: int = rng.randi_range(0, (maze_height - 1))
-	set_cell_state(Vector2i(rand_x, rand_y), CellState.SEED)
+	var rand_coords := Vector2i(rand_x, rand_y)
+	set_cell_state(rand_coords, CellState.SEED)
+	active_cell_coords = rand_coords
+
+func set_cell_state(coords: Vector2i, new_state: CellState) -> void:
+	var old_state := maze[coords].state
+	match old_state:
+		CellState.SEED:
+			seed_cells.erase(coords)
+		CellState.CONNECTED:
+			connected_cell_count -= 1
+	
+	match new_state:
+		CellState.SEED:
+			seed_cells.append(coords)
+		CellState.CONNECTED:
+			connected_cell_count += 1
+			# Stop working when the maze is complete
+			if connected_cell_count == maze.size():
+				SignalBus.maze_complete.emit()
+				update_timer.stop()
+	
+	maze[coords].state = new_state
+	SignalBus.update_cell.emit(coords, new_state)
 
 # Run cell simulation until one or more cells change state
 func _on_progress_generation() -> void:
@@ -104,10 +130,7 @@ func _on_progress_generation() -> void:
 			
 			# Immediately change to the connected state if no valid neighbours were found
 			if candidate_directions.is_empty():
-				maze[active_cell_coords].state = CellState.CONNECTED
-				# Complete the maze if this was the last disconnected cell
-				if disconnected_cell_count == 0:
-					is_maze_complete = true
+				set_cell_state(active_cell_coords, CellState.CONNECTED)
 				return
 			
 			# Update this seed cell's valid neighbour list
@@ -132,32 +155,28 @@ func _on_progress_generation() -> void:
 			
 			# Remember this neighbour, then change states
 			maze[active_cell_coords].invite_vector = chosen_candidate
-			maze[active_cell_coords].state = CellState.INVITE
+			set_cell_state(active_cell_coords, CellState.INVITE)
 			
 		CellState.INVITE:
 			# Change invited cell into seed state
 			var neighbour_coords := active_cell_coords + \
 					DIRECTIONS[maze[active_cell_coords].invite_vector]
-			maze[neighbour_coords].state = CellState.SEED
-			seed_cells.append(neighbour_coords)
-			disconnected_cell_count -= 1
+			set_cell_state(neighbour_coords, CellState.SEED)
 			
 			# Change into connected state if invited cell was the only neighbour
 			var neighbour_candidates: int = maze[active_cell_coords].neighbours
 			if (neighbour_candidates != 0) \
 					and (neighbour_candidates & (neighbour_candidates - 1) == 0):
-				maze[active_cell_coords].state = CellState.CONNECTED
-				seed_cells.erase(active_cell_coords)
+				set_cell_state(active_cell_coords, CellState.CONNECTED)
 				return
 			
 			# Randomly decide whether or not to branch in another direction
 			if rng.randi_range(1, 100) > branch_probability: # Change to final state
-				maze[active_cell_coords].state = CellState.CONNECTED
-				seed_cells.erase(active_cell_coords)
+				set_cell_state(active_cell_coords, CellState.CONNECTED)
 				# Remember that we may be able to branch again later if all seeds die
 				branchable_connected_cells.append(active_cell_coords)
 			else: # Return to seed state for another branch
-				maze[active_cell_coords].state = CellState.SEED
+				set_cell_state(active_cell_coords, CellState.SEED)
 			
 		CellState.CONNECTED:
 			# If there's at least one live seed, give control to the oldest one
@@ -184,13 +203,17 @@ func _on_progress_generation() -> void:
 					branchable_connected_cells.remove_at(i)
 				# Randomly decide whether or not to revert to a seed again
 				elif rng.randi_range(1, 100) <= branch_probability:
-					maze[branchable_connected_cells[i]].state = CellState.SEED
-					seed_cells.append(branchable_connected_cells[i])
+					set_cell_state(branchable_connected_cells[i], CellState.SEED)
 					new_seed_found = true
 			
 			# If no new seeds were created, choose one random valid candidate
 			if not new_seed_found:
 				var chosen_candidate: Vector2i = branchable_connected_cells[
 						randi_range(0, len(branchable_connected_cells) - 1)]
-				maze[chosen_candidate].state = CellState.SEED
-				seed_cells.append(chosen_candidate)
+				set_cell_state(chosen_candidate, CellState.SEED)
+
+func _on_update_timer_timeout() -> void:
+	_on_progress_generation()
+
+func _on_maze_complete() -> void:
+	return

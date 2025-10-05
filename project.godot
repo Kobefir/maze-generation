@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Maze Generation"
+run/main_scene="uid://d2jqibm3vtgex"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -28,3 +29,4 @@ folder_colors={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.105882354, 0.14117648, 0.2784314, 1)
