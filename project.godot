@@ -13,20 +13,28 @@ config_version=5
 config/name="Maze Generation"
 run/main_scene="uid://d2jqibm3vtgex"
 config/features=PackedStringArray("4.5", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://art/icon.svg"
 
 [autoload]
 
 SignalBus="*res://signal_bus.gd"
 
+[display]
+
+window/stretch/mode="viewport"
+window/stretch/scale_mode="integer"
+
 [file_customization]
 
 folder_colors={
+"res://art/": "pink",
 "res://aseprite/": "teal"
 }
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 environment/defaults/default_clear_color=Color(0.105882354, 0.14117648, 0.2784314, 1)
+2d/snap/snap_2d_transforms_to_pixel=true
