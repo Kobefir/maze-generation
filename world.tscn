@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://d2jqibm3vtgex"]
+[gd_scene load_steps=4 format=3 uid="uid://d2jqibm3vtgex"]
 
 [ext_resource type="Script" uid="uid://ddepihu7vsn5e" path="res://cellular_automata.gd" id="1_f3sb7"]
+[ext_resource type="TileSet" uid="uid://bt85yuwn2tfrb" path="res://map_ui.tres" id="2_tlwt5"]
+[ext_resource type="Script" uid="uid://met31er2yvbq" path="res://map.gd" id="3_aqk2v"]
 
 [node name="World" type="Node2D"]
 
@@ -9,11 +11,69 @@ script = ExtResource("1_f3sb7")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="Map" type="Node2D" parent="UI"]
+[node name="Map" type="TileMapLayer" parent="UI"]
+position = Vector2(100, 0)
+tile_map_data = PackedByteArray(0, 0, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 255, 255, 0, 0, 1, 0, 0, 0, 0, 0, 253, 255, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 251, 255, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 247, 255, 253, 255, 0, 0, 1, 0, 0, 0, 0, 0)
+tile_set = ExtResource("2_tlwt5")
+collision_enabled = false
+navigation_enabled = false
+script = ExtResource("3_aqk2v")
 
-[node name="Button" type="Button" parent="UI"]
-offset_left = 527.0
-offset_top = 562.0
-offset_right = 688.0
-offset_bottom = 620.0
+[node name="MazeProperties" type="VBoxContainer" parent="UI"]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/separation = 16
+
+[node name="GenerateMazeButton" type="Button" parent="UI/MazeProperties"]
+layout_mode = 2
 text = "Generate maze"
+
+[node name="WidthContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+layout_mode = 2
+
+[node name="WidthLabel" type="Label" parent="UI/MazeProperties/WidthContainer"]
+layout_mode = 2
+text = "Maze width"
+
+[node name="WidthInput" type="LineEdit" parent="UI/MazeProperties/WidthContainer"]
+clip_contents = true
+layout_mode = 2
+text = "8"
+
+[node name="HeightContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+layout_mode = 2
+
+[node name="HeightLabel" type="Label" parent="UI/MazeProperties/HeightContainer"]
+layout_mode = 2
+text = "Maze height"
+
+[node name="HeightInput" type="LineEdit" parent="UI/MazeProperties/HeightContainer"]
+clip_contents = true
+layout_mode = 2
+text = "8"
+
+[node name="FloorWidthContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+layout_mode = 2
+
+[node name="FloorWidthLabel" type="Label" parent="UI/MazeProperties/FloorWidthContainer"]
+layout_mode = 2
+text = "Floor width"
+
+[node name="FloorWidthInput" type="LineEdit" parent="UI/MazeProperties/FloorWidthContainer"]
+clip_contents = true
+layout_mode = 2
+text = "2"
+
+[node name="WallWidthContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+layout_mode = 2
+
+[node name="WallWidthLabel" type="Label" parent="UI/MazeProperties/WallWidthContainer"]
+layout_mode = 2
+text = "Wall width"
+
+[node name="WallWidthInput" type="LineEdit" parent="UI/MazeProperties/WallWidthContainer"]
+clip_contents = true
+layout_mode = 2
+text = "1"
+
+[node name="Camera2D" type="Camera2D" parent="."]
