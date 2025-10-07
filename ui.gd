@@ -5,12 +5,18 @@ extends CanvasLayer
 @export var maze_height_input: LineEdit
 @export var floor_width_input: LineEdit
 @export var wall_width_input: LineEdit
-
-func _init() -> void:
-	generate_maze_button.pressed.connect(_on_generate_maze_button_pressed)
+@export var branch_chance_input: LineEdit
+@export var turn_chance_input: LineEdit
+@export var seed_input: LineEdit
+@export var update_speed_input: LineEdit
 
 func _on_generate_maze_button_pressed() -> void:
 	var maze_width: int = maze_width_input.text.to_int()
 	var maze_height: int = maze_height_input.text.to_int()
 	var floor_width: int = floor_width_input.text.to_int()
 	var wall_width: int = wall_width_input.text.to_int()
+	var branch_chance: int = branch_chance_input.text.to_int()
+	var turn_chance: int = turn_chance_input.text.to_int()
+	var seed: int = seed_input.text.to_int()
+	var update_speed: float = update_speed_input.text.to_float()
+	

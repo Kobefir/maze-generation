@@ -83,4 +83,54 @@ clip_contents = true
 layout_mode = 2
 text = "1"
 
+[node name="BranchContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+layout_mode = 2
+
+[node name="BranchLabel" type="Label" parent="UI/MazeProperties/BranchContainer"]
+layout_mode = 2
+text = "Branch probability"
+
+[node name="BranchInput" type="LineEdit" parent="UI/MazeProperties/BranchContainer"]
+clip_contents = true
+layout_mode = 2
+text = "5"
+
+[node name="TurnContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+layout_mode = 2
+
+[node name="TurnLabel" type="Label" parent="UI/MazeProperties/TurnContainer"]
+layout_mode = 2
+text = "Turn probability"
+
+[node name="TurnInput" type="LineEdit" parent="UI/MazeProperties/TurnContainer"]
+clip_contents = true
+layout_mode = 2
+text = "10"
+
+[node name="SeedContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+layout_mode = 2
+
+[node name="SeedLabel" type="Label" parent="UI/MazeProperties/SeedContainer"]
+layout_mode = 2
+text = "Seed"
+
+[node name="SeedInput" type="LineEdit" parent="UI/MazeProperties/SeedContainer"]
+clip_contents = true
+layout_mode = 2
+text = "-1"
+
+[node name="UpdateSpeedContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+layout_mode = 2
+
+[node name="UpdateSpeedLabel" type="Label" parent="UI/MazeProperties/UpdateSpeedContainer"]
+layout_mode = 2
+text = "Update speed"
+
+[node name="UpdateSpeedInput" type="LineEdit" parent="UI/MazeProperties/UpdateSpeedContainer"]
+clip_contents = true
+layout_mode = 2
+text = "0.1"
+
 [node name="Camera2D" type="Camera2D" parent="."]
+
+[connection signal="pressed" from="UI/MazeProperties/GenerateMazeButton" to="UI" method="_on_generate_maze_button_pressed"]
