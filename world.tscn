@@ -12,125 +12,137 @@ script = ExtResource("1_f3sb7")
 
 [node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("generate_maze_button", "maze_width_input", "maze_height_input", "floor_width_input", "wall_width_input")]
 script = ExtResource("2_aqk2v")
-generate_maze_button = NodePath("MazeProperties/GenerateMazeButton")
-maze_width_input = NodePath("MazeProperties/WidthContainer/WidthInput")
-maze_height_input = NodePath("MazeProperties/HeightContainer/HeightInput")
-floor_width_input = NodePath("MazeProperties/FloorWidthContainer/FloorWidthInput")
-wall_width_input = NodePath("MazeProperties/WallWidthContainer/WallWidthInput")
+generate_maze_button = NodePath("ScrollContainer/MazeProperties/GenerateMazeButton")
+maze_width_input = NodePath("ScrollContainer/MazeProperties/WidthContainer/WidthInput")
+maze_height_input = NodePath("ScrollContainer/MazeProperties/HeightContainer/HeightInput")
+floor_width_input = NodePath("ScrollContainer/MazeProperties/FloorWidthContainer/FloorWidthInput")
+wall_width_input = NodePath("ScrollContainer/MazeProperties/WallWidthContainer/WallWidthInput")
 
 [node name="Map" type="TileMapLayer" parent="UI"]
-position = Vector2(100, 0)
+position = Vector2(400, 400)
 tile_map_data = PackedByteArray(0, 0, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 255, 255, 0, 0, 1, 0, 0, 0, 0, 0, 253, 255, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 251, 255, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 247, 255, 253, 255, 0, 0, 1, 0, 0, 0, 0, 0)
 tile_set = ExtResource("2_tlwt5")
 collision_enabled = false
 navigation_enabled = false
 script = ExtResource("3_aqk2v")
 
-[node name="MazeProperties" type="VBoxContainer" parent="UI"]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="ScrollContainer" type="ScrollContainer" parent="UI"]
+custom_minimum_size = Vector2(200, 400)
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 216.0
+offset_bottom = 416.0
+horizontal_scroll_mode = 0
+
+[node name="MazeProperties" type="VBoxContainer" parent="UI/ScrollContainer"]
+layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="GenerateMazeButton" type="Button" parent="UI/MazeProperties"]
+[node name="GenerateMazeButton" type="Button" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 text = "Generate maze"
 
-[node name="WidthContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+[node name="ProgressGenButton" type="Button" parent="UI/ScrollContainer/MazeProperties"]
+layout_mode = 2
+text = "Progress generation"
+
+[node name="WidthContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 
-[node name="WidthLabel" type="Label" parent="UI/MazeProperties/WidthContainer"]
+[node name="WidthLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/WidthContainer"]
 layout_mode = 2
 text = "Maze width"
 
-[node name="WidthInput" type="LineEdit" parent="UI/MazeProperties/WidthContainer"]
+[node name="WidthInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/WidthContainer"]
 clip_contents = true
 layout_mode = 2
 text = "8"
 
-[node name="HeightContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+[node name="HeightContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 
-[node name="HeightLabel" type="Label" parent="UI/MazeProperties/HeightContainer"]
+[node name="HeightLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/HeightContainer"]
 layout_mode = 2
 text = "Maze height"
 
-[node name="HeightInput" type="LineEdit" parent="UI/MazeProperties/HeightContainer"]
+[node name="HeightInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/HeightContainer"]
 clip_contents = true
 layout_mode = 2
 text = "8"
 
-[node name="FloorWidthContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+[node name="FloorWidthContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 
-[node name="FloorWidthLabel" type="Label" parent="UI/MazeProperties/FloorWidthContainer"]
+[node name="FloorWidthLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/FloorWidthContainer"]
 layout_mode = 2
 text = "Floor width"
 
-[node name="FloorWidthInput" type="LineEdit" parent="UI/MazeProperties/FloorWidthContainer"]
+[node name="FloorWidthInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/FloorWidthContainer"]
 clip_contents = true
 layout_mode = 2
 text = "2"
 
-[node name="WallWidthContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+[node name="WallWidthContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 
-[node name="WallWidthLabel" type="Label" parent="UI/MazeProperties/WallWidthContainer"]
+[node name="WallWidthLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/WallWidthContainer"]
 layout_mode = 2
 text = "Wall width"
 
-[node name="WallWidthInput" type="LineEdit" parent="UI/MazeProperties/WallWidthContainer"]
+[node name="WallWidthInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/WallWidthContainer"]
 clip_contents = true
 layout_mode = 2
 text = "1"
 
-[node name="BranchContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+[node name="BranchContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 
-[node name="BranchLabel" type="Label" parent="UI/MazeProperties/BranchContainer"]
+[node name="BranchLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/BranchContainer"]
 layout_mode = 2
 text = "Branch probability"
 
-[node name="BranchInput" type="LineEdit" parent="UI/MazeProperties/BranchContainer"]
+[node name="BranchInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/BranchContainer"]
 clip_contents = true
 layout_mode = 2
 text = "5"
 
-[node name="TurnContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+[node name="TurnContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 
-[node name="TurnLabel" type="Label" parent="UI/MazeProperties/TurnContainer"]
+[node name="TurnLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/TurnContainer"]
 layout_mode = 2
 text = "Turn probability"
 
-[node name="TurnInput" type="LineEdit" parent="UI/MazeProperties/TurnContainer"]
+[node name="TurnInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/TurnContainer"]
 clip_contents = true
 layout_mode = 2
 text = "10"
 
-[node name="SeedContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+[node name="SeedContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 
-[node name="SeedLabel" type="Label" parent="UI/MazeProperties/SeedContainer"]
+[node name="SeedLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/SeedContainer"]
 layout_mode = 2
 text = "Seed"
 
-[node name="SeedInput" type="LineEdit" parent="UI/MazeProperties/SeedContainer"]
+[node name="SeedInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/SeedContainer"]
 clip_contents = true
 layout_mode = 2
 text = "-1"
 
-[node name="UpdateSpeedContainer" type="VBoxContainer" parent="UI/MazeProperties"]
+[node name="UpdateSpeedContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 
-[node name="UpdateSpeedLabel" type="Label" parent="UI/MazeProperties/UpdateSpeedContainer"]
+[node name="UpdateSpeedLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer"]
 layout_mode = 2
 text = "Update speed"
 
-[node name="UpdateSpeedInput" type="LineEdit" parent="UI/MazeProperties/UpdateSpeedContainer"]
+[node name="UpdateSpeedInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer"]
 clip_contents = true
 layout_mode = 2
 text = "0.1"
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
-[connection signal="pressed" from="UI/MazeProperties/GenerateMazeButton" to="UI" method="_on_generate_maze_button_pressed"]
+[connection signal="pressed" from="UI/ScrollContainer/MazeProperties/GenerateMazeButton" to="UI" method="_on_generate_maze_button_pressed"]
+[connection signal="pressed" from="UI/ScrollContainer/MazeProperties/ProgressGenButton" to="UI" method="_on_generate_maze_button_pressed"]

@@ -17,6 +17,13 @@ func _on_generate_maze_button_pressed() -> void:
 	var wall_width: int = wall_width_input.text.to_int()
 	var branch_chance: int = branch_chance_input.text.to_int()
 	var turn_chance: int = turn_chance_input.text.to_int()
-	var seed: int = seed_input.text.to_int()
-	var update_speed: float = update_speed_input.text.to_float()
-	
+	var maze_seed: int = seed_input.text.to_int()
+	SignalBus.generate_maze.emit(
+		maze_width,
+		maze_height,
+		floor_width,
+		wall_width,
+		branch_chance,
+		turn_chance,
+		maze_seed
+	)
