@@ -173,15 +173,22 @@ func _on_step_maze() -> void:
 			if (neighbour_candidates != 0) \
 					and (neighbour_candidates & (neighbour_candidates - 1) == 0):
 				set_cell_state(active_cell_coords, CellState.CONNECTED)
+				print("only one neighbour at " + str(active_cell_coords))
 				return
+			# TODO ------------------------------------------------
+			s
+			
+			
+			
 			
 			# Randomly decide whether or not to branch in another direction
 			if rng.randi_range(1, 100) > branch_probability: # Change to final state
 				set_cell_state(active_cell_coords, CellState.CONNECTED)
-				# Remember that we may be able to branch again later if all seeds die
-				branchable_connected_cells.append(active_cell_coords)
 			else: # Return to seed state for another branch
 				set_cell_state(active_cell_coords, CellState.SEED)
+			
+			# Remember that we may be able to branch again later if all seeds die
+			branchable_connected_cells.append(active_cell_coords)
 			
 		CellState.CONNECTED:
 			# If there's at least one live seed, give control to the oldest one
@@ -189,9 +196,9 @@ func _on_step_maze() -> void:
 				active_cell_coords = seed_cells[0]
 				return
 			
-			# Randomly pick a new seed out of branchable connected seeds
+			# Randomly pick a new seed out of connected cells with disconnected neighbours
 			var new_seed_found := false
-			for i in range(len(branchable_connected_cells) - 1): # Indirectly access this array so we can erase from it
+			for candidate in branchable_connected_cells:
 				# Look in each direction for neighbours in the disconnected state
 				var neighbour_coords: Vector2i
 				var found_neighbours: int = 0b0000
@@ -205,10 +212,10 @@ func _on_step_maze() -> void:
 				
 				# Remove this cell from the candidates if it no longer has valid neighbours
 				if found_neighbours == 0:
-					branchable_connected_cells.remove_at(i)
+					branchable_connected_cells.erase(candidate)
 				# Randomly decide whether or not to revert to a seed again
 				elif rng.randi_range(1, 100) <= branch_probability:
-					set_cell_state(branchable_connected_cells[i], CellState.SEED)
+					set_cell_state(candidate, CellState.SEED)
 					new_seed_found = true
 			
 			# If no new seeds were created, choose one random valid candidate
@@ -218,6 +225,7 @@ func _on_step_maze() -> void:
 				set_cell_state(chosen_candidate, CellState.SEED)
 
 func _on_update_timer_timeout() -> void:
+	_on_step_maze()
 	_on_step_maze()
 
 func _on_maze_complete() -> void:

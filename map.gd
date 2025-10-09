@@ -28,7 +28,7 @@ func _on_new_maze(params: Dictionary[StringName, int]) -> void:
 	# Fill the maze with disconnected tiles
 	for x in range(maze_width):
 		for y in range(maze_height):
-			set_cell(Vector2i(maze_width, maze_height), 0, DISCONNECTED)
+			set_cell(Vector2i(x, y), 0, DISCONNECTED)
 
 func _on_update_cell(cell_coords: Vector2i,
 		new_state: CellularAutomata.CellState) -> void:
