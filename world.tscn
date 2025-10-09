@@ -10,13 +10,18 @@
 [node name="Maze" type="Node2D" parent="."]
 script = ExtResource("1_f3sb7")
 
-[node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("generate_maze_button", "maze_width_input", "maze_height_input", "floor_width_input", "wall_width_input")]
+[node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("new_maze_button", "step_maze_button", "maze_width_input", "maze_height_input", "floor_width_input", "wall_width_input", "branch_chance_input", "turn_chance_input", "seed_input", "update_speed_input")]
 script = ExtResource("2_aqk2v")
-generate_maze_button = NodePath("ScrollContainer/MazeProperties/GenerateMazeButton")
+new_maze_button = NodePath("ScrollContainer/MazeProperties/NewMazeButton")
+step_maze_button = NodePath("ScrollContainer/MazeProperties/StepMazeButton")
 maze_width_input = NodePath("ScrollContainer/MazeProperties/WidthContainer/WidthInput")
 maze_height_input = NodePath("ScrollContainer/MazeProperties/HeightContainer/HeightInput")
 floor_width_input = NodePath("ScrollContainer/MazeProperties/FloorWidthContainer/FloorWidthInput")
 wall_width_input = NodePath("ScrollContainer/MazeProperties/WallWidthContainer/WallWidthInput")
+branch_chance_input = NodePath("ScrollContainer/MazeProperties/BranchContainer/BranchInput")
+turn_chance_input = NodePath("ScrollContainer/MazeProperties/TurnContainer/TurnInput")
+seed_input = NodePath("ScrollContainer/MazeProperties/SeedContainer/SeedInput")
+update_speed_input = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/UpdateSpeedInput")
 
 [node name="Map" type="TileMapLayer" parent="UI"]
 position = Vector2(400, 400)
@@ -38,11 +43,11 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="GenerateMazeButton" type="Button" parent="UI/ScrollContainer/MazeProperties"]
+[node name="NewMazeButton" type="Button" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 text = "Generate maze"
 
-[node name="ProgressGenButton" type="Button" parent="UI/ScrollContainer/MazeProperties"]
+[node name="StepMazeButton" type="Button" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 text = "Progress generation"
 
@@ -143,6 +148,3 @@ layout_mode = 2
 text = "0.1"
 
 [node name="Camera2D" type="Camera2D" parent="."]
-
-[connection signal="pressed" from="UI/ScrollContainer/MazeProperties/GenerateMazeButton" to="UI" method="_on_generate_maze_button_pressed"]
-[connection signal="pressed" from="UI/ScrollContainer/MazeProperties/ProgressGenButton" to="UI" method="_on_generate_maze_button_pressed"]

@@ -43,13 +43,14 @@ class Cell:
 	var invite_vector: int = -1		# 0-3: North, East, South, West
 	var neighbours: int = 0b0000	# 4 bits: North, East, South, West
 
-func _init():
-	SignalBus.generate_maze.connect(_on_generate_maze)
-	SignalBus.progress_generation.connect(_on_progress_generation)
+func _ready() -> void:
+	SignalBus.new_maze.connect(_on_new_maze)
+	SignalBus.step_maze.connect(_on_step_maze)
 	
 	update_timer = Timer.new()
 	update_timer.timeout.connect(_on_update_timer_timeout)
 	update_timer.wait_time = update_frequency
+	add_child(update_timer)
 	
 	rng = RandomNumberGenerator.new()
 	
@@ -59,7 +60,11 @@ func _init():
 	
 	rng_initial_state = rng.state
 
-func _on_generate_maze() -> void:
+func _on_new_maze(params: Dictionary[StringName, int]) -> void:
+	# Assign the maze parameters to this node
+	for prop in params.keys():
+		set(prop, params[prop])
+	
 	clear_maze()
 	pick_start_seed()
 	update_timer.start()
@@ -107,7 +112,7 @@ func set_cell_state(coords: Vector2i, new_state: CellState) -> void:
 	SignalBus.update_cell.emit(coords, new_state)
 
 # Run cell simulation until one or more cells change state
-func _on_progress_generation() -> void:
+func _on_step_maze() -> void:
 	match maze[active_cell_coords].state:
 		CellState.DISCONNECTED:
 			return
@@ -151,7 +156,7 @@ func _on_progress_generation() -> void:
 			# We will not be going straight forward or we only have one candidate
 			if chosen_candidate == -1:
 				chosen_candidate = candidate_directions[
-						rng.randi_range(0, len(candidate_directions))]
+						rng.randi_range(0, (len(candidate_directions) - 1))]
 			
 			# Remember this neighbour, then change states
 			maze[active_cell_coords].invite_vector = chosen_candidate
@@ -186,7 +191,7 @@ func _on_progress_generation() -> void:
 			
 			# Randomly pick a new seed out of branchable connected seeds
 			var new_seed_found := false
-			for i in range(len(branchable_connected_cells)): # Indirectly access this array so we can erase from it
+			for i in range(len(branchable_connected_cells) - 1): # Indirectly access this array so we can erase from it
 				# Look in each direction for neighbours in the disconnected state
 				var neighbour_coords: Vector2i
 				var found_neighbours: int = 0b0000
@@ -213,7 +218,7 @@ func _on_progress_generation() -> void:
 				set_cell_state(chosen_candidate, CellState.SEED)
 
 func _on_update_timer_timeout() -> void:
-	_on_progress_generation()
+	_on_step_maze()
 
 func _on_maze_complete() -> void:
 	return

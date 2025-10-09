@@ -1,6 +1,7 @@
 extends CanvasLayer
 
-@export var generate_maze_button: Button
+@export var new_maze_button: Button
+@export var step_maze_button: Button
 @export var maze_width_input: LineEdit
 @export var maze_height_input: LineEdit
 @export var floor_width_input: LineEdit
@@ -10,7 +11,14 @@ extends CanvasLayer
 @export var seed_input: LineEdit
 @export var update_speed_input: LineEdit
 
-func _on_generate_maze_button_pressed() -> void:
+
+func _ready() -> void:
+	new_maze_button.pressed.connect(_on_new_maze_button_pressed)
+	step_maze_button.pressed.connect(_on_step_maze_button_pressed)
+
+func _on_new_maze_button_pressed() -> void:
+	# Declare params outside of the Dictionary so we can perform
+	# input validation later
 	var maze_width: int = maze_width_input.text.to_int()
 	var maze_height: int = maze_height_input.text.to_int()
 	var floor_width: int = floor_width_input.text.to_int()
@@ -18,12 +26,18 @@ func _on_generate_maze_button_pressed() -> void:
 	var branch_chance: int = branch_chance_input.text.to_int()
 	var turn_chance: int = turn_chance_input.text.to_int()
 	var maze_seed: int = seed_input.text.to_int()
-	SignalBus.generate_maze.emit(
-		maze_width,
-		maze_height,
-		floor_width,
-		wall_width,
-		branch_chance,
-		turn_chance,
-		maze_seed
-	)
+	
+	# Build the parameter list as a statically-typed Dictionary
+	var params: Dictionary[StringName, int]
+	params[&"maze_width"] = maze_width
+	params[&"maze_height"] = maze_height
+	params[&"floor_width"] = floor_width
+	params[&"wall_width"] = wall_width
+	params[&"branch_chance"] = branch_chance
+	params[&"turn_chance"] = turn_chance
+	params[&"maze_seed"] = maze_seed
+	
+	SignalBus.new_maze.emit(params)
+
+func _on_step_maze_button_pressed() -> void:
+	SignalBus.step_maze.emit()
