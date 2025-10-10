@@ -89,6 +89,7 @@ func pick_start_seed() -> void:
 	var rand_coords := Vector2i(rand_x, rand_y)
 	set_cell_state(rand_coords, CellState.SEED)
 	active_cell_coords = rand_coords
+	branchable_connected_cells.append(rand_coords)
 
 func set_cell_state(coords: Vector2i, new_state: CellState) -> void:
 	var old_state := maze[coords].state
@@ -111,6 +112,18 @@ func set_cell_state(coords: Vector2i, new_state: CellState) -> void:
 	maze[coords].state = new_state
 	SignalBus.update_cell.emit(coords, new_state)
 
+func get_disconnected_neighbours(coords: Vector2i) -> void:
+	# Look in each direction for neighbours in the disconnected state
+	for i in range(len(DIRECTIONS)):
+		neighbour_coords = coords + DIRECTIONS[i]
+		
+		# Ensure coordinates are in-bounds
+		if maze.has(neighbour_coords):
+			if maze[neighbour_coords].state == CellState.DISCONNECTED:
+				# Add the direction to the valid neighbour to the bitfield
+				found_neighbours = found_neighbours | (2 ** i)
+				candidate_directions.append(i)
+
 # Run cell simulation until one or more cells change state
 func _on_step_maze() -> void:
 	match maze[active_cell_coords].state:
@@ -122,16 +135,7 @@ func _on_step_maze() -> void:
 			var found_neighbours: int = 0b0000 # 4 bits: North, East, South, West
 			var candidate_directions: Array[int]
 			
-			# Look in each direction for neighbours in the disconnected state
-			for i in range(len(DIRECTIONS)):
-				neighbour_coords = active_cell_coords + DIRECTIONS[i]
-				
-				# Ensure coordinates are in-bounds
-				if maze.has(neighbour_coords):
-					if maze[neighbour_coords].state == CellState.DISCONNECTED:
-						# Add the direction to the valid neighbour to the bitfield
-						found_neighbours = found_neighbours | (2 ** i)
-						candidate_directions.append(i)
+
 			
 			# Immediately change to the connected state if no valid neighbours were found
 			if candidate_directions.is_empty():
@@ -176,7 +180,7 @@ func _on_step_maze() -> void:
 				print("only one neighbour at " + str(active_cell_coords))
 				return
 			# TODO ------------------------------------------------
-			s
+			
 			
 			
 			

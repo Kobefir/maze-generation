@@ -9,6 +9,15 @@
 
 [node name="Maze" type="Node2D" parent="."]
 script = ExtResource("1_f3sb7")
+maze_width = null
+maze_height = null
+rng_seed = null
+initial_density = null
+wall_thickness = null
+floor_thickness = null
+branch_probability = null
+turn_probability = null
+update_frequency = null
 
 [node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("new_maze_button", "step_maze_button", "maze_width_input", "maze_height_input", "floor_width_input", "wall_width_input", "branch_chance_input", "turn_chance_input", "seed_input", "update_speed_input")]
 script = ExtResource("2_aqk2v")
