@@ -10,9 +10,7 @@ class_name CellularAutomata extends Node2D
 @export var floor_thickness: int = 1
 @export var branch_probability: int = 5 # Percent chance of branching
 @export var turn_probability: int = 10 # Percent chance of changing path direction
-
 @export var update_frequency: float = 0.05 # Number of seconds between _step_generation() calls
-
 
 var maze: Dictionary[Vector2i, Cell]
 var rng: RandomNumberGenerator
@@ -50,14 +48,9 @@ func _ready() -> void:
 	SignalBus.update_speed_changed.connect(_on_update_speed_changed)
 	SignalBus.maze_paused.connect(_on_maze_paused)
 	SignalBus.maze_played.connect(_on_maze_played)
+	SignalBus.maze_complete.connect(_on_maze_complete)
 	
 	rng = RandomNumberGenerator.new()
-	
-	# Set the RandomNumberGenerator's seed if one was chosen by the player
-	if rng_seed != -1:
-		rng.seed = rng_seed
-	
-	rng_initial_state = rng.state
 
 func _physics_process(delta: float) -> void:
 	if not is_maze_paused:
@@ -68,12 +61,20 @@ func _physics_process(delta: float) -> void:
 
 func _on_new_maze(params: Dictionary[StringName, int]) -> void:
 	# Assign the maze parameters to this node
-	for prop in params.keys():
-		set(prop, params[prop])
+	for prop in params.keys(): set(prop, params[prop])
 	
+	# Reset maze TileMapLayer and properties
 	clear_maze()
-	pick_start_seed()
+	seed_cells.clear()
+	branchable_connected_cells.clear()
+	connected_cell_count = 0
 	is_maze_paused = true
+	
+	# Pick a random RandomNumberGenerator seed if there's no user-input seed
+	if rng_seed == -1: rng.randomize()
+	else: rng.seed = rng_seed
+	rng_initial_state = rng.state
+	pick_first_seed_cell()
 
 # Pause or resume maze generation
 func toggle_pause() -> void:
@@ -96,13 +97,13 @@ func clear_maze() -> void:
 			coords.x = x
 			coords.y = y
 			new_maze[coords] = Cell.new()
-			SignalBus.update_cell.emit(coords, CellState.DISCONNECTED)
+			SignalBus.update_cell.emit(coords, CellState.DISCONNECTED, -1)
 	
 	maze = new_maze
 	connected_cell_count = 0
 
 # Set a random cell in the maze to the seed state
-func pick_start_seed() -> void:
+func pick_first_seed_cell() -> void:
 	var rand_x: int = rng.randi_range(0, (maze_width - 1))
 	var rand_y: int = rng.randi_range(0, (maze_height - 1))
 	var rand_coords := Vector2i(rand_x, rand_y)
@@ -129,7 +130,7 @@ func set_cell_state(coords: Vector2i, new_state: CellState) -> void:
 				is_maze_paused = true
 	
 	maze[coords].state = new_state
-	SignalBus.update_cell.emit(coords, new_state)
+	SignalBus.update_cell.emit(coords, new_state, maze[coords].invite_vector)
 
 # Return an array of DIRECTIONS to disconnected neighbour cells from coords
 func find_disconnected_neighbours(coords: Vector2i) -> Array[int]:

@@ -10,7 +10,8 @@ signal step_maze()
 signal update_speed_changed(new_speed: float)
 
 @warning_ignore("unused_signal")
-signal update_cell(cell_coords: Vector2i, new_state: CellularAutomata.CellState)
+signal update_cell(cell_coords: Vector2i,
+		new_state: CellularAutomata.CellState, invite_vector: int)
 
 @warning_ignore("unused_signal")
 signal maze_complete()
