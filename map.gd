@@ -14,21 +14,8 @@ var maze_width: int
 var maze_height: int
 
 func _ready() -> void:
-	SignalBus.new_maze.connect(_on_new_maze)
 	SignalBus.update_cell.connect(_on_update_cell)
-	SignalBus.step_maze.connect(_on_step_maze)
-
-func _on_new_maze(params: Dictionary[StringName, int]) -> void:
-	# Delete all tiles on the map
-	clear()
-	
-	maze_width = params[&"maze_width"]
-	maze_height = params[&"maze_height"]
-	
-	# Fill the maze with disconnected tiles
-	for x in range(maze_width):
-		for y in range(maze_height):
-			set_cell(Vector2i(x, y), 0, DISCONNECTED)
+	SignalBus.new_maze.connect(_on_new_maze)
 
 func _on_update_cell(cell_coords: Vector2i,
 		new_state: CellularAutomata.CellState) -> void:
@@ -45,5 +32,8 @@ func _on_update_cell(cell_coords: Vector2i,
 	
 	set_cell(cell_coords, 0, new_tile)
 
-func _on_step_maze() -> void:
-	return
+# UI node most be above the Maze node in the scene tree because
+# nodes execute _on_new_maze in the order they appear in the scene tree
+func _on_new_maze(_params) -> void:
+	clear()
+	# Create an empty map of 

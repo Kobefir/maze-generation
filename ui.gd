@@ -10,11 +10,15 @@ extends CanvasLayer
 @export var turn_chance_input: LineEdit
 @export var seed_input: LineEdit
 @export var update_speed_input: LineEdit
-
+@export var pause_button: Button
+@export var play_button: Button
 
 func _ready() -> void:
 	new_maze_button.pressed.connect(_on_new_maze_button_pressed)
 	step_maze_button.pressed.connect(_on_step_maze_button_pressed)
+	update_speed_input.text_changed.connect(_on_update_speed_changed.bind())
+	pause_button.pressed.connect(_on_pause_button_pressed)
+	play_button.pressed.connect(_on_play_button_pressed)
 
 func _on_new_maze_button_pressed() -> void:
 	# Declare params outside of the Dictionary so we can perform
@@ -41,3 +45,16 @@ func _on_new_maze_button_pressed() -> void:
 
 func _on_step_maze_button_pressed() -> void:
 	SignalBus.step_maze.emit()
+
+func _on_update_speed_changed(new_val: String) -> void:
+	var parsed_val := new_val.to_float()
+	if parsed_val == 0.0:
+		update_speed_input.text = "0"
+	
+	SignalBus.update_speed_changed.emit(parsed_val)
+
+func _on_pause_button_pressed() -> void:
+	SignalBus.maze_paused.emit()
+
+func _on_play_button_pressed() -> void:
+	SignalBus.maze_played.emit()

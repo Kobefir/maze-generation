@@ -2,24 +2,14 @@
 
 [ext_resource type="Script" uid="uid://ddepihu7vsn5e" path="res://cellular_automata.gd" id="1_f3sb7"]
 [ext_resource type="Script" uid="uid://cmxvrt3puad8v" path="res://ui.gd" id="2_aqk2v"]
-[ext_resource type="TileSet" uid="uid://bt85yuwn2tfrb" path="res://map_ui.tres" id="2_tlwt5"]
+[ext_resource type="TileSet" uid="uid://cxnpf76q08m5y" path="res://map_ui.tres" id="2_tlwt5"]
 [ext_resource type="Script" uid="uid://met31er2yvbq" path="res://map.gd" id="3_aqk2v"]
 
 [node name="World" type="Node2D"]
 
-[node name="Maze" type="Node2D" parent="."]
-script = ExtResource("1_f3sb7")
-maze_width = null
-maze_height = null
-rng_seed = null
-initial_density = null
-wall_thickness = null
-floor_thickness = null
-branch_probability = null
-turn_probability = null
-update_frequency = null
-
-[node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("new_maze_button", "step_maze_button", "maze_width_input", "maze_height_input", "floor_width_input", "wall_width_input", "branch_chance_input", "turn_chance_input", "seed_input", "update_speed_input")]
+[node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("new_maze_button", "step_maze_button", "maze_width_input", "maze_height_input", "floor_width_input", "wall_width_input", "branch_chance_input", "turn_chance_input", "seed_input", "update_speed_input", "pause_button", "play_button")]
+scale = Vector2(2, 2)
+transform = Transform2D(2, 0, 0, 2, 0, 0)
 script = ExtResource("2_aqk2v")
 new_maze_button = NodePath("ScrollContainer/MazeProperties/NewMazeButton")
 step_maze_button = NodePath("ScrollContainer/MazeProperties/StepMazeButton")
@@ -31,9 +21,11 @@ branch_chance_input = NodePath("ScrollContainer/MazeProperties/BranchContainer/B
 turn_chance_input = NodePath("ScrollContainer/MazeProperties/TurnContainer/TurnInput")
 seed_input = NodePath("ScrollContainer/MazeProperties/SeedContainer/SeedInput")
 update_speed_input = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/UpdateSpeedInput")
+pause_button = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/PlayPauseContainer/PauseButton")
+play_button = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/PlayPauseContainer/PlayButton")
 
 [node name="Map" type="TileMapLayer" parent="UI"]
-position = Vector2(400, 400)
+position = Vector2(300, 150)
 tile_set = ExtResource("2_tlwt5")
 collision_enabled = false
 navigation_enabled = false
@@ -41,10 +33,10 @@ script = ExtResource("3_aqk2v")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="UI"]
 custom_minimum_size = Vector2(200, 400)
-offset_left = 16.0
-offset_top = 16.0
-offset_right = 216.0
-offset_bottom = 416.0
+offset_right = 200.0
+offset_bottom = 400.0
+scale = Vector2(0.5, 0.5)
+pivot_offset = Vector2(16, 16)
 horizontal_scroll_mode = 0
 
 [node name="MazeProperties" type="VBoxContainer" parent="UI/ScrollContainer"]
@@ -53,11 +45,36 @@ theme_override_constants/separation = 16
 
 [node name="NewMazeButton" type="Button" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
-text = "Generate maze"
+text = "New maze"
+
+[node name="UpdateSpeedContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
+layout_mode = 2
+
+[node name="UpdateSpeedLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer"]
+layout_mode = 2
+text = "Generation speed"
+
+[node name="UpdateSpeedInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer"]
+clip_contents = true
+layout_mode = 2
+text = "0.05"
+
+[node name="PlayPauseContainer" type="HBoxContainer" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer"]
+layout_mode = 2
+
+[node name="PlayButton" type="Button" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer/PlayPauseContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Play"
+
+[node name="PauseButton" type="Button" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer/PlayPauseContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Pause"
 
 [node name="StepMazeButton" type="Button" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
-text = "Progress generation"
+text = "Do one step"
 
 [node name="WidthContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
@@ -143,16 +160,7 @@ clip_contents = true
 layout_mode = 2
 text = "-1"
 
-[node name="UpdateSpeedContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
-layout_mode = 2
+[node name="Maze" type="Node2D" parent="."]
+script = ExtResource("1_f3sb7")
 
-[node name="UpdateSpeedLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer"]
-layout_mode = 2
-text = "Update speed"
-
-[node name="UpdateSpeedInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer"]
-clip_contents = true
-layout_mode = 2
-text = "0.05"
-
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="WorldCamera" type="Camera2D" parent="."]
