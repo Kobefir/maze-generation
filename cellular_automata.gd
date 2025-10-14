@@ -249,7 +249,8 @@ func _on_maze_stepped() -> void:
 	
 	step_generation()
 
-func _on_maze_complete() -> void:
+func _on_maze_complete(_params: Dictionary[StringName, int],
+		_maze: Dictionary[Vector2i, Cell]) -> void:
 	print("maze complete")
 
 func _on_update_speed_changed(new_val: float) -> void:
