@@ -6,8 +6,8 @@ class_name CellularAutomata extends Node2D
 
 @export var rng_seed: int = -1
 @export var initial_density: float = 0.5
-@export var wall_thickness: int = 1
-@export var floor_thickness: int = 1
+@export var wall_size: int = 1
+@export var floor_size: int = 1
 @export var branch_probability: int = 5 # Percent chance of branching
 @export var turn_probability: int = 10 # Percent chance of changing path direction
 @export var update_frequency: float = 0.05 # Number of seconds between _step_generation() calls
@@ -126,7 +126,14 @@ func set_cell_state(coords: Vector2i, new_state: CellState) -> void:
 			connected_cell_count += 1
 			# Stop working when the maze is complete
 			if connected_cell_count == maze.size():
-				SignalBus.maze_complete.emit()
+				# Pass the maze size info forward to build the TileMapLayer
+				var params: Dictionary[StringName, int] = {
+					&"maze_width": maze_width,
+					&"maze_height": maze_height,
+					&"wall_size": wall_size,
+					&"floor_size": floor_size
+				}
+				SignalBus.maze_complete.emit(params, maze)
 				is_maze_paused = true
 	
 	maze[coords].state = new_state

@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://d2jqibm3vtgex"]
+[gd_scene load_steps=7 format=3 uid="uid://d2jqibm3vtgex"]
 
 [ext_resource type="Script" uid="uid://ddepihu7vsn5e" path="res://cellular_automata.gd" id="1_f3sb7"]
 [ext_resource type="Script" uid="uid://cmxvrt3puad8v" path="res://ui.gd" id="2_aqk2v"]
 [ext_resource type="TileSet" uid="uid://cxnpf76q08m5y" path="res://map_ui.tres" id="2_tlwt5"]
 [ext_resource type="Script" uid="uid://met31er2yvbq" path="res://map.gd" id="3_aqk2v"]
+[ext_resource type="TileSet" uid="uid://cl2x2o4jmfuyt" path="res://world_tiles.tres" id="5_036b0"]
+[ext_resource type="Script" uid="uid://drhxy2v5feegb" path="res://maze.gd" id="6_dwbse"]
 
 [node name="World" type="Node2D"]
 
@@ -160,7 +162,14 @@ clip_contents = true
 layout_mode = 2
 text = "-1"
 
-[node name="Maze" type="Node2D" parent="."]
+[node name="CellularAutomata" type="Node2D" parent="."]
 script = ExtResource("1_f3sb7")
 
+[node name="Maze" type="TileMapLayer" parent="CellularAutomata"]
+tile_set = ExtResource("5_036b0")
+occlusion_enabled = false
+navigation_enabled = false
+script = ExtResource("6_dwbse")
+
 [node name="WorldCamera" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)

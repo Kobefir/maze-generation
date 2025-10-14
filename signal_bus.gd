@@ -10,11 +10,14 @@ signal step_maze()
 signal update_speed_changed(new_speed: float)
 
 @warning_ignore("unused_signal")
-signal update_cell(cell_coords: Vector2i,
+signal update_cell(
+		cell_coords: Vector2i,
 		new_state: CellularAutomata.CellState, invite_vector: int)
 
 @warning_ignore("unused_signal")
-signal maze_complete()
+signal maze_complete(
+		params: Dictionary[StringName, int],
+		maze: Dictionary[Vector2i, CellularAutomata.Cell])
 
 @warning_ignore("unused_signal")
 signal maze_paused()
