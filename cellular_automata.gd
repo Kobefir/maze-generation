@@ -199,6 +199,9 @@ func step_generation() -> void:
 					DIRECTIONS[maze[active_cell_coords].invite_vector]
 			set_cell_state(neighbour_coords, CellState.SEED)
 			
+			# Point invited cell's connect_vector to this cell
+			maze[neighbour_coords].connect_vector = (maze[active_cell_coords].invite_vector + 2) % 4
+			
 			# Change into connected state if invited cell was the only neighbour
 			var neighbour_candidates: int = maze[active_cell_coords].neighbours
 			if (neighbour_candidates != 0) \

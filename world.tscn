@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://d2jqibm3vtgex"]
+[gd_scene load_steps=8 format=3 uid="uid://d2jqibm3vtgex"]
 
 [ext_resource type="Script" uid="uid://ddepihu7vsn5e" path="res://cellular_automata.gd" id="1_f3sb7"]
 [ext_resource type="Script" uid="uid://cmxvrt3puad8v" path="res://ui.gd" id="2_aqk2v"]
@@ -6,10 +6,11 @@
 [ext_resource type="Script" uid="uid://met31er2yvbq" path="res://map.gd" id="3_aqk2v"]
 [ext_resource type="TileSet" uid="uid://cl2x2o4jmfuyt" path="res://world_tiles.tres" id="5_036b0"]
 [ext_resource type="Script" uid="uid://drhxy2v5feegb" path="res://maze.gd" id="6_dwbse"]
+[ext_resource type="Script" uid="uid://c1lnybunon1up" path="res://world_camera.gd" id="7_pkg7o"]
 
 [node name="World" type="Node2D"]
 
-[node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("new_maze_button", "step_maze_button", "maze_width_input", "maze_height_input", "floor_width_input", "wall_width_input", "branch_chance_input", "turn_chance_input", "seed_input", "update_speed_input", "pause_button", "play_button")]
+[node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("new_maze_button", "step_maze_button", "maze_width_input", "maze_height_input", "floor_size_input", "wall_size_input", "branch_chance_input", "turn_chance_input", "seed_input", "update_speed_input", "pause_button", "play_button")]
 scale = Vector2(2, 2)
 transform = Transform2D(2, 0, 0, 2, 0, 0)
 script = ExtResource("2_aqk2v")
@@ -17,8 +18,8 @@ new_maze_button = NodePath("ScrollContainer/MazeProperties/NewMazeButton")
 step_maze_button = NodePath("ScrollContainer/MazeProperties/StepMazeButton")
 maze_width_input = NodePath("ScrollContainer/MazeProperties/WidthContainer/WidthInput")
 maze_height_input = NodePath("ScrollContainer/MazeProperties/HeightContainer/HeightInput")
-floor_width_input = NodePath("ScrollContainer/MazeProperties/FloorWidthContainer/FloorWidthInput")
-wall_width_input = NodePath("ScrollContainer/MazeProperties/WallWidthContainer/WallWidthInput")
+floor_size_input = NodePath("ScrollContainer/MazeProperties/FloorSizeContainer/FloorSizeInput")
+wall_size_input = NodePath("ScrollContainer/MazeProperties/WallSizeContainer/WallSizeInput")
 branch_chance_input = NodePath("ScrollContainer/MazeProperties/BranchContainer/BranchInput")
 turn_chance_input = NodePath("ScrollContainer/MazeProperties/TurnContainer/TurnInput")
 seed_input = NodePath("ScrollContainer/MazeProperties/SeedContainer/SeedInput")
@@ -102,26 +103,26 @@ clip_contents = true
 layout_mode = 2
 text = "8"
 
-[node name="FloorWidthContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
+[node name="FloorSizeContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 
-[node name="FloorWidthLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/FloorWidthContainer"]
+[node name="FloorSizeLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/FloorSizeContainer"]
 layout_mode = 2
 text = "Floor width"
 
-[node name="FloorWidthInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/FloorWidthContainer"]
+[node name="FloorSizeInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/FloorSizeContainer"]
 clip_contents = true
 layout_mode = 2
 text = "2"
 
-[node name="WallWidthContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
+[node name="WallSizeContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
 
-[node name="WallWidthLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/WallWidthContainer"]
+[node name="WallSizeLabel" type="Label" parent="UI/ScrollContainer/MazeProperties/WallSizeContainer"]
 layout_mode = 2
 text = "Wall width"
 
-[node name="WallWidthInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/WallWidthContainer"]
+[node name="WallSizeInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/WallSizeContainer"]
 clip_contents = true
 layout_mode = 2
 text = "1"
@@ -172,4 +173,4 @@ navigation_enabled = false
 script = ExtResource("6_dwbse")
 
 [node name="WorldCamera" type="Camera2D" parent="."]
-zoom = Vector2(2, 2)
+script = ExtResource("7_pkg7o")
