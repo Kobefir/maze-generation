@@ -8,8 +8,8 @@ class_name CellularAutomata extends Node2D
 @export var initial_density: float = 0.5
 @export var wall_size: int = 1
 @export var floor_size: int = 1
-@export var branch_probability: int = 5 # Percent chance of branching
-@export var turn_probability: int = 10 # Percent chance of changing path direction
+@export var branch_chance: int = 5 # Percent chance of branching
+@export var turn_chance: int = 10 # Percent chance of changing path direction
 @export var update_frequency: float = 0.05 # Number of seconds between _step_generation() calls
 
 var maze: Dictionary[Vector2i, Cell]
@@ -58,6 +58,7 @@ func _physics_process(delta: float) -> void:
 		if update_timer <= 0:
 			update_timer = update_frequency
 			step_generation()
+
 
 func _on_new_maze(params: Dictionary[StringName, int]) -> void:
 	# Assign the maze parameters to this node
@@ -165,6 +166,11 @@ func step_generation() -> void:
 			return
 			
 		CellState.SEED:
+			# Give control to a random seed if there's more than one
+			if len(seed_cells) > 1:
+				active_cell_coords = seed_cells[
+						rng.randi_range(0, (len(seed_cells) - 1))]
+			
 			var candidate_directions: Array[int] \
 					= find_disconnected_neighbours(active_cell_coords)
 			
@@ -179,7 +185,7 @@ func step_generation() -> void:
 			# Bias towards going straight forward rather than turning
 			if len(candidate_directions) > 1 and parent_direction != -1 \
 					and candidate_directions.has((parent_direction + 2) % 4):
-				if rng.randi_range(1, 100) > turn_probability:
+				if rng.randi_range(1, 100) > turn_chance:
 					chosen_candidate = (parent_direction + 2) % 4
 				else:
 					candidate_directions.erase((parent_direction + 2) % 4)
@@ -209,7 +215,7 @@ func step_generation() -> void:
 				set_cell_state(active_cell_coords, CellState.CONNECTED)
 			
 			# Randomly decide whether or not to branch in another direction
-			if rng.randi_range(1, 100) > branch_probability: # Change to final state
+			if rng.randi_range(1, 100) > branch_chance: # Change to final state
 				set_cell_state(active_cell_coords, CellState.CONNECTED)
 			else: # Return to seed state for another branch
 				set_cell_state(active_cell_coords, CellState.SEED)
@@ -236,7 +242,7 @@ func step_generation() -> void:
 				if found_neighbour_dirs.is_empty():
 					branchable_connected_cells.erase(candidate)
 				# Randomly decide whether or not to revert to a seed again
-				elif rng.randi_range(1, 100) <= branch_probability:
+				elif rng.randi_range(1, 100) <= branch_chance:
 					set_cell_state(candidate, CellState.SEED)
 					new_seed_found = true
 			

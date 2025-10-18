@@ -66,6 +66,12 @@ func _on_update_cell(cell_coords: Vector2i,
 # nodes execute _on_new_maze in the order they appear in the scene tree
 func _on_new_maze(params) -> void:
 	clear()
+	# Scare down the display if it's big enough to get in the way
+	if params[&"maze_width"] > 12 or params[&"maze_height"] > 12:
+		scale = Vector2(0.5, 0.5)
+	else:
+		scale = Vector2.ONE
+	
 	# Create an empty map of all-disconnected cells with one cell of padding
 	var cell_coords: Vector2i
 	for x in range((2 * params[&"maze_width"]) + 1):

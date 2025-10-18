@@ -1,4 +1,4 @@
-extends TileMapLayer
+class_name Maze extends TileMapLayer
 
 # Tile atlas coords
 var FLOOR := Vector2i(0, 0)
@@ -6,16 +6,10 @@ var WALL := Vector2i(1, 0)
 
 func _ready() -> void:
 	SignalBus.maze_complete.connect(_on_maze_complete)
+	SignalBus.new_maze.connect(_on_new_maze)
 
 func build_maze(params: Dictionary[StringName, int],
 		maze: Dictionary[Vector2i, CellularAutomata.Cell]) -> void:
-	# General pseudocode:
-	# For each cell:
-	#   fill a square of length floor_size
-	#   if connect_vector:
-	#   fill an area of dimensions floor_size * wall_size in dir of connect_vector
-	# Then, set a wall everywhere there isn't a floor
-	
 	# Build a scaled TileMapLayer maze matching the layout of the CellularAutomata maze
 	var cell_coords: Vector2i
 	var fill_origin: Vector2i
@@ -78,3 +72,6 @@ func fill_rect(from: Vector2i, width: int, height: int, tile: Vector2i,
 func _on_maze_complete(params: Dictionary[StringName, int],
 		maze: Dictionary[Vector2i, CellularAutomata.Cell]) -> void:
 	build_maze(params, maze)
+
+func _on_new_maze(_params: Dictionary[StringName, int]) -> void:
+	clear()

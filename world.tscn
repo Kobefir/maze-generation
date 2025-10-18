@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://d2jqibm3vtgex"]
+[gd_scene load_steps=9 format=3 uid="uid://d2jqibm3vtgex"]
 
 [ext_resource type="Script" uid="uid://ddepihu7vsn5e" path="res://cellular_automata.gd" id="1_f3sb7"]
 [ext_resource type="Script" uid="uid://cmxvrt3puad8v" path="res://ui.gd" id="2_aqk2v"]
@@ -6,13 +6,12 @@
 [ext_resource type="Script" uid="uid://met31er2yvbq" path="res://map.gd" id="3_aqk2v"]
 [ext_resource type="TileSet" uid="uid://cl2x2o4jmfuyt" path="res://world_tiles.tres" id="5_036b0"]
 [ext_resource type="Script" uid="uid://drhxy2v5feegb" path="res://maze.gd" id="6_dwbse"]
+[ext_resource type="Script" uid="uid://ddpumrrgy8ki5" path="res://maze_transformer.gd" id="7_gbfbk"]
 [ext_resource type="Script" uid="uid://c1lnybunon1up" path="res://world_camera.gd" id="7_pkg7o"]
 
 [node name="World" type="Node2D"]
 
 [node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("new_maze_button", "step_maze_button", "maze_width_input", "maze_height_input", "floor_size_input", "wall_size_input", "branch_chance_input", "turn_chance_input", "seed_input", "update_speed_input", "pause_button", "play_button")]
-scale = Vector2(2, 2)
-transform = Transform2D(2, 0, 0, 2, 0, 0)
 script = ExtResource("2_aqk2v")
 new_maze_button = NodePath("ScrollContainer/MazeProperties/NewMazeButton")
 step_maze_button = NodePath("ScrollContainer/MazeProperties/StepMazeButton")
@@ -28,7 +27,7 @@ pause_button = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/Pla
 play_button = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/PlayPauseContainer/PlayButton")
 
 [node name="Map" type="TileMapLayer" parent="UI"]
-position = Vector2(300, 150)
+position = Vector2(240, 16)
 tile_set = ExtResource("2_tlwt5")
 collision_enabled = false
 navigation_enabled = false
@@ -36,10 +35,10 @@ script = ExtResource("3_aqk2v")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="UI"]
 custom_minimum_size = Vector2(200, 400)
-offset_right = 200.0
-offset_bottom = 400.0
-scale = Vector2(0.5, 0.5)
-pivot_offset = Vector2(16, 16)
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 216.0
+offset_bottom = 616.0
 horizontal_scroll_mode = 0
 
 [node name="MazeProperties" type="VBoxContainer" parent="UI/ScrollContainer"]
@@ -171,6 +170,10 @@ tile_set = ExtResource("5_036b0")
 occlusion_enabled = false
 navigation_enabled = false
 script = ExtResource("6_dwbse")
+
+[node name="MazeTransformer" type="Node" parent="CellularAutomata" node_paths=PackedStringArray("maze")]
+script = ExtResource("7_gbfbk")
+maze = NodePath("../Maze")
 
 [node name="WorldCamera" type="Camera2D" parent="."]
 script = ExtResource("7_pkg7o")
