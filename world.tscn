@@ -11,7 +11,7 @@
 
 [node name="World" type="Node2D"]
 
-[node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("new_maze_button", "step_maze_button", "maze_width_input", "maze_height_input", "floor_size_input", "wall_size_input", "branch_chance_input", "turn_chance_input", "seed_input", "update_speed_input", "pause_button", "play_button")]
+[node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("new_maze_button", "step_maze_button", "maze_width_input", "maze_height_input", "floor_size_input", "wall_size_input", "branch_chance_input", "turn_chance_input", "seed_input", "normal_button", "fast_button", "pause_button", "play_button", "reset_camera_button", "finish_maze_button")]
 script = ExtResource("2_aqk2v")
 new_maze_button = NodePath("ScrollContainer/MazeProperties/NewMazeButton")
 step_maze_button = NodePath("ScrollContainer/MazeProperties/StepMazeButton")
@@ -22,9 +22,12 @@ wall_size_input = NodePath("ScrollContainer/MazeProperties/WallSizeContainer/Wal
 branch_chance_input = NodePath("ScrollContainer/MazeProperties/BranchContainer/BranchInput")
 turn_chance_input = NodePath("ScrollContainer/MazeProperties/TurnContainer/TurnInput")
 seed_input = NodePath("ScrollContainer/MazeProperties/SeedContainer/SeedInput")
-update_speed_input = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/UpdateSpeedInput")
+normal_button = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/SpeedContainer/NormalButton")
+fast_button = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/SpeedContainer/FastButton")
 pause_button = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/PlayPauseContainer/PauseButton")
 play_button = NodePath("ScrollContainer/MazeProperties/UpdateSpeedContainer/PlayPauseContainer/PlayButton")
+reset_camera_button = NodePath("ResetCameraButton")
+finish_maze_button = NodePath("ScrollContainer/MazeProperties/FinishMazeButton")
 
 [node name="Map" type="TileMapLayer" parent="UI"]
 position = Vector2(240, 16)
@@ -56,10 +59,18 @@ layout_mode = 2
 layout_mode = 2
 text = "Generation speed"
 
-[node name="UpdateSpeedInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer"]
-clip_contents = true
+[node name="SpeedContainer" type="HBoxContainer" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer"]
 layout_mode = 2
-text = "0.05"
+
+[node name="NormalButton" type="Button" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer/SpeedContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Normal"
+
+[node name="FastButton" type="Button" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer/SpeedContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Fast"
 
 [node name="PlayPauseContainer" type="HBoxContainer" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer"]
 layout_mode = 2
@@ -67,16 +78,24 @@ layout_mode = 2
 [node name="PlayButton" type="Button" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer/PlayPauseContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+disabled = true
 text = "Play"
 
 [node name="PauseButton" type="Button" parent="UI/ScrollContainer/MazeProperties/UpdateSpeedContainer/PlayPauseContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+disabled = true
 text = "Pause"
 
 [node name="StepMazeButton" type="Button" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
+disabled = true
 text = "Do one step"
+
+[node name="FinishMazeButton" type="Button" parent="UI/ScrollContainer/MazeProperties"]
+layout_mode = 2
+disabled = true
+text = "Finish maze"
 
 [node name="WidthContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
@@ -136,7 +155,7 @@ text = "Branch probability"
 [node name="BranchInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/BranchContainer"]
 clip_contents = true
 layout_mode = 2
-text = "5"
+text = "18"
 
 [node name="TurnContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
@@ -148,7 +167,7 @@ text = "Turn probability"
 [node name="TurnInput" type="LineEdit" parent="UI/ScrollContainer/MazeProperties/TurnContainer"]
 clip_contents = true
 layout_mode = 2
-text = "10"
+text = "18"
 
 [node name="SeedContainer" type="VBoxContainer" parent="UI/ScrollContainer/MazeProperties"]
 layout_mode = 2
@@ -161,6 +180,13 @@ text = "Seed"
 clip_contents = true
 layout_mode = 2
 text = "-1"
+
+[node name="ResetCameraButton" type="Button" parent="UI"]
+offset_left = 1018.0
+offset_top = 599.0
+offset_right = 1107.0
+offset_bottom = 630.0
+text = "Reset camera"
 
 [node name="CellularAutomata" type="Node2D" parent="."]
 script = ExtResource("1_f3sb7")

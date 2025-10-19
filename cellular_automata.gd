@@ -10,7 +10,10 @@ class_name CellularAutomata extends Node2D
 @export var floor_size: int = 1
 @export var branch_chance: int = 5 # Percent chance of branching
 @export var turn_chance: int = 10 # Percent chance of changing path direction
-@export var update_frequency: float = 0.05 # Number of seconds between _step_generation() calls
+
+# Number of seconds between _step_generation() calls when autoplayed
+@export var normal_update_speed: float = 0.05
+@export var fast_update_speed: float = 0.0
 
 var maze: Dictionary[Vector2i, Cell]
 var rng: RandomNumberGenerator
@@ -20,7 +23,9 @@ var seed_cells: Array[Vector2i]
 var branchable_connected_cells: Array[Vector2i]
 var connected_cell_count: int
 var update_timer: float
+var update_frequency: float
 var is_maze_paused: bool = true
+var is_maze_complete: bool
 
 var DIRECTIONS: Array[Vector2i] = [
 	Vector2i.UP,	# Direction 0
@@ -45,12 +50,15 @@ class Cell:
 func _ready() -> void:
 	SignalBus.new_maze.connect(_on_new_maze)
 	SignalBus.step_maze.connect(_on_maze_stepped)
-	SignalBus.update_speed_changed.connect(_on_update_speed_changed)
 	SignalBus.maze_paused.connect(_on_maze_paused)
 	SignalBus.maze_played.connect(_on_maze_played)
 	SignalBus.maze_complete.connect(_on_maze_complete)
+	SignalBus.speed_set_normal.connect(_on_speed_set_normal)
+	SignalBus.speed_set_fast.connect(_on_speed_set_fast)
+	SignalBus.maze_hurried.connect(_on_maze_hurried)
 	
 	rng = RandomNumberGenerator.new()
+	update_frequency = normal_update_speed
 
 func _physics_process(delta: float) -> void:
 	if not is_maze_paused:
@@ -58,7 +66,6 @@ func _physics_process(delta: float) -> void:
 		if update_timer <= 0:
 			update_timer = update_frequency
 			step_generation()
-
 
 func _on_new_maze(params: Dictionary[StringName, int]) -> void:
 	# Assign the maze parameters to this node
@@ -70,6 +77,7 @@ func _on_new_maze(params: Dictionary[StringName, int]) -> void:
 	branchable_connected_cells.clear()
 	connected_cell_count = 0
 	is_maze_paused = true
+	is_maze_complete = false
 	
 	# Pick a random RandomNumberGenerator seed if there's no user-input seed
 	if rng_seed == -1: rng.randomize()
@@ -79,11 +87,8 @@ func _on_new_maze(params: Dictionary[StringName, int]) -> void:
 
 # Pause or resume maze generation
 func toggle_pause() -> void:
-	if is_maze_paused:
-		is_maze_paused = false
-	else:
-		is_maze_paused = true
-	
+	if is_maze_paused: is_maze_paused = false
+	else: is_maze_paused = true
 	update_timer = update_frequency
 
 # Create empty maze consisting only of disconnected cells
@@ -161,6 +166,9 @@ func find_disconnected_neighbours(coords: Vector2i) -> Array[int]:
 
 # Run cell simulation until one or more cells change state
 func step_generation() -> void:
+	if is_maze_complete:
+		return
+	
 	match maze[active_cell_coords].state:
 		CellState.DISCONNECTED:
 			return
@@ -260,10 +268,7 @@ func _on_maze_stepped() -> void:
 
 func _on_maze_complete(_params: Dictionary[StringName, int],
 		_maze: Dictionary[Vector2i, Cell]) -> void:
-	print("maze complete")
-
-func _on_update_speed_changed(new_val: float) -> void:
-	update_frequency = new_val
+	is_maze_complete = true
 
 func _on_maze_paused() -> void:
 	if not is_maze_paused:
@@ -272,3 +277,17 @@ func _on_maze_paused() -> void:
 func _on_maze_played() -> void:
 	if is_maze_paused:
 		toggle_pause()
+
+func _on_speed_set_normal() -> void:
+	update_frequency = normal_update_speed
+
+func _on_speed_set_fast() -> void:
+	update_frequency = fast_update_speed
+
+func _on_maze_hurried() -> void:
+	if is_maze_complete:
+		return
+	
+	while not is_maze_complete:
+		step_generation()
+		print("generating")
