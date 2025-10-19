@@ -290,4 +290,3 @@ func _on_maze_hurried() -> void:
 	
 	while not is_maze_complete:
 		step_generation()
-		print("generating")
