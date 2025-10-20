@@ -17,10 +17,10 @@ func _on_maze_complete(
 		params: Dictionary[StringName, int],
 		_maze: Dictionary[Vector2i, CellularAutomata.Cell]) -> void:
 	# Save all of the "cells" in the TileMap, excluding the outermost walls
-	var cells_width: int = (params[&"maze_width"] * (params[&"wall_size"] - 1)) \
-			+ (params[&"maze_width"] * params[&"floor_size"])
+	var cells_width: int = (params[&"maze_width"] * params[&"wall_size"]) \
+			+ (params[&"maze_width"] * params[&"floor_size"]) - params[&"wall_size"]
 	var cells_height: int = (params[&"maze_height"] * params[&"wall_size"]) \
-			+ (params[&"maze_height"] * params[&"floor_size"])
+			+ (params[&"maze_height"] * params[&"floor_size"]) - params[&"wall_size"]
 	var cells_origin := Vector2i(params[&"wall_size"], params[&"wall_size"])
 	maze.fill_rect(cells_origin, cells_width, cells_height, FLOOR)
 	for x in range(4):
